@@ -1,90 +1,95 @@
 const express = require("express");
 const app = express();
-const mongoose = require("mongoose")
-const listing = require("./models/listing")
+const mongoose = require("mongoose");
 const path = require("path");
-const mongoURL = 'mongodb://127.0.0.1:27017/travelbnb';
+const mongoURL = "mongodb://127.0.0.1:27017/travelbnb";
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
+const ExpressError = require("./utils/expressError.js");
+const listingRouter = require("./routes/listing.js");
+const reviewRouter = require("./routes/review.js");
+const session = require("express-session");
+const flash = require("connect-flash");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const User = require("./models/user.js");
+const userRouter = require("./routes/user.js");
 
-main().catch(err => console.log(err));
+const sessionOptions = {
+  secret: "mysupersecretcode",
+  resave: "false",
+  saveUnitialized: "true",
+  cookie: {
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+  },
+};
+
+app.use(session(sessionOptions));
+app.use(flash());
+
+
+
+
+
+
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+
+app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  res.locals.currUser = req.user;
+  res.locals.isAuthenticated = req.isAuthenticated();
+  next();
+});
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+main().catch((err) => console.log(err));
 
 async function main() {
   await mongoose.connect(mongoURL);
-
 }
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
-app.use(express.static(path.join(__dirname,"/public")));
+app.use(express.static(path.join(__dirname, "/public")));
 
 
-app.use(express.urlencoded({ extended: true }));
 
 
-app.get("/", (req, res)=>{
-    res.send("Hello I am root");
+app.get("/demouser", async (req,res)=>{
+let fakeUser = new User({
+    email: "student@gmail.com",
+    username : "delta-student",
 });
 
-//get route
-app.get("/listings", async (req,res)=>{
-  const allListing = await listing.find({})
-        res.render("listings/index.ejs", {allListing});
-    });
-
-     //New Route
-     app.get("/listings/new", async (req,res)=>{
-        res.render("listings/new.ejs");
-    })
-
-
-    //creat Route
-    app.post("/listings", async(req,res)=>{
-        const newListing = new listing(req.body.listing);
-        await newListing.save();
-        res.redirect("/listings");
-    });
-
-
-
-
-    //show route
-    app.get("/listings/:id" ,async (req,res)=>{
-        let {id}=req.params;
-     const foundListing =   await listing.findById(id);
-     res.render("listings/show.ejs", {foundListing});
-    });
-
-
-    //edit route
-    app.get("/listings/:id/edit", async(req,res)=>{
-        let {id}=req.params;
-        const foundListing =   await listing.findById(id);
-        res.render("listings/edit.ejs", {foundListing})
-    });
- 
-    //update route
-    app.put("/listings/:id", async(req,res)=>{
-        let {id}=req.params;
-        await listing.findByIdAndUpdate(id, {...req.body.listing});
-        res.redirect("/listings");
-    })
-
-//Delete route
-app.delete("/listings/:id", async(req,res)=>{
-    let {id}=req.params;
-    let deletedListing = await listing.findByIdAndDelete(id);
-    console.log(deletedListing);
-    res.redirect("/listings");
+let registeredUser = await User.register(fakeUser, "HelloWorld");
+res.send(registeredUser);
 })
 
-app.use((err,req,res,next)=>{
-    res.send("Something went Wrong");
-});
-   
+app.use("/listings", listingRouter);
+app.use("/listings/:id/reviews", reviewRouter);
+app.use("/", userRouter);
 
-app.listen(8080, ()=>{
-    console.log("Server is listening to port 8080");
+app.all("*", (req, res, next) => {
+  next(new ExpressError(404, "Page Not Found!"));
+});
+
+app.use((err, req, res, next) => {
+  let { statusCode = 500, message = "Somethhing Went Wrong" } = err;
+  res.status(statusCode).send(message);
+  res.render("error.ejs", { message });
+});
+
+app.listen(8080, () => {
+  console.log("Server is listening to port 8080");
 });

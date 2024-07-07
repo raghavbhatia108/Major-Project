@@ -56,7 +56,7 @@ body{
    margin:0rem 1rem;
 }
 
-.card{
+.listing-card{
     border: none !important;
     margin-bottom: 2rem;
 }
@@ -104,4 +104,8 @@ opacity: 0.2;
 
 .show-card{
     padding: 0;
+}
+.card{
+    display: flex !important;
+    flex-wrap: wrap;
 }
