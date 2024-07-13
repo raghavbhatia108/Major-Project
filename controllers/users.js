@@ -34,7 +34,7 @@ module.exports.renderLoginForm =  (req,res)=>{
 };
 
 module.exports.login = async(req,res)=>{
-  req.flash("success", "Wlecome back to TravelBNB");
+  req.flash("success", "Welcome back to TravelBNB");
   let redirectUrl = res.locals.redirectUrl || ("/listings");
   res.redirect(redirectUrl);
 };
