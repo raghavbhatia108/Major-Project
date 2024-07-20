@@ -99,7 +99,7 @@ opacity: 0.2;
 }
 
 .show-img{
-    height: 40vh;
+    height: 50vh;
 }
 
 .show-card{
@@ -108,4 +108,9 @@ opacity: 0.2;
 .card{
     display: flex !important;
     flex-wrap: wrap;
+}
+
+#map{
+    height: 400px;;
+    width: 80vh;
 }
