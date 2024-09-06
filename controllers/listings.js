@@ -18,7 +18,6 @@ module.exports.showListings = async (req,res)=>{
     let {id}=req.params;
  const foundListing =   await listing.findById(id).populate({path: "reviews", populate:{path:"author"},}).populate("owner");
  res.render("listings/show.ejs", {foundListing});
- console.log(foundListing);
 };
 
 module.exports.createListings = async(req,res, next)=>{
@@ -37,7 +36,6 @@ module.exports.createListings = async(req,res, next)=>{
     newListing.image = {url, filename};
     newListing.geometry = response.body.features[0].geometry;
     let savedListing = await newListing.save();
-    console.log(savedListing);
     req.flash("success", "New Listing Created");
     res.redirect("/listings");
 }
@@ -47,7 +45,6 @@ module.exports.editRenderForm = async(req,res)=>{
     const foundListing =   await listing.findById(id);
     let originalImageUrl=foundListing.image.url;
     originalImageUrl = originalImageUrl.replace("/upload", "/upload/w_250");
-    console.log(originalImageUrl)
     res.render("listings/edit.ejs", {foundListing, originalImageUrl});
 };
 
@@ -69,7 +66,6 @@ module.exports.updateListing = async(req,res)=>{
 module.exports.destroyListing = async(req,res)=>{
     let {id}=req.params;
     let deletedListing = await listing.findByIdAndDelete(id);
-    console.log(deletedListing);
     req.flash("success", "Listing deleted");
     res.redirect("/listings");
 };
