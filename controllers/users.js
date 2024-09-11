@@ -3,7 +3,7 @@ const User = require("../models/user");
 
 
 module.exports.renderSignupForm = (req, res)=>{
-    res.render("users/signup.ejs");
+    return res.render("users/signup.ejs");
 }; 
 
 
@@ -18,25 +18,25 @@ module.exports.signup = async (req,res)=>{
             return next(err);
           }
           req.flash("success", "Welcome to TravelBNB");
-          res.redirect("/listings");    
+          return res.redirect("/listings");    
         })
        
     }
   catch(e){
     console.log(e.message);
     req.flash("error", e.message);
-    res.redirect("/signup");
+    return res.redirect("/signup");
   }
 };
 
 module.exports.renderLoginForm =  (req,res)=>{
-  res.render("users/login.ejs");
+  return res.render("users/login.ejs");
 };
 
 module.exports.login = async(req,res)=>{
   req.flash("success", "Welcome back to TravelBNB");
   let redirectUrl = res.locals.redirectUrl || ("/listings");
-  res.redirect(redirectUrl);
+  return res.redirect(redirectUrl);
 };
 
 module.exports.logout =  (req,res,next)=>{
@@ -45,6 +45,6 @@ module.exports.logout =  (req,res,next)=>{
       next(err);
     }
     req.flash("success", "you are logged out");
-    res.redirect("/listings");
+    return res.redirect("/listings");
   })
 };

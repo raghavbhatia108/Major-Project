@@ -7,14 +7,14 @@ const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 module.exports.index = async (req, res, next) => {
     try {
         const allListing = await listing.find({});
-        res.render("listings/index.ejs", { allListing });
+        return res.render("listings/index.ejs", { allListing });
     } catch (err) {
         next(err); // Pass error to Express error handler
     }
 };
 
 module.exports.renderNewForm = async (req, res) => {
-    res.render("listings/new.ejs");
+    return res.render("listings/new.ejs");
 };
 
 module.exports.showListings = async (req, res, next) => {
@@ -25,7 +25,7 @@ module.exports.showListings = async (req, res, next) => {
             populate: { path: "author" },
         }).populate("owner");
 
-        res.render("listings/show.ejs", { foundListing });
+        return res.render("listings/show.ejs", { foundListing });
     } catch (err) {
         next(err); // Pass error to Express error handler
     }
@@ -59,7 +59,7 @@ module.exports.editRenderForm = async (req, res, next) => {
         const foundListing = await listing.findById(id);
         let originalImageUrl = foundListing.image.url;
         originalImageUrl = originalImageUrl.replace("/upload", "/upload/w_250");
-        res.render("listings/edit.ejs", { foundListing, originalImageUrl });
+        return res.render("listings/edit.ejs", { foundListing, originalImageUrl });
     } catch (err) {
         next(err); // Pass error to Express error handler
     }
