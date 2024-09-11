@@ -7,14 +7,14 @@ const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 module.exports.index = async (req, res, next) => {
     try {
         const allListing = await listing.find({});
-        res.render("listings/index.ejs", { allListing });
+        return res.render("listings/index.ejs", { allListing }); // Return added here
     } catch (err) {
-        next(err); // Pass error to Express error handler
+        return next(err); // Return added here
     }
 };
 
 module.exports.renderNewForm = async (req, res) => {
-    res.render("listings/new.ejs");
+    return res.render("listings/new.ejs"); // Return added here
 };
 
 module.exports.showListings = async (req, res, next) => {
@@ -25,9 +25,9 @@ module.exports.showListings = async (req, res, next) => {
             populate: { path: "author" },
         }).populate("owner");
 
-        res.render("listings/show.ejs", { foundListing });
+        return res.render("listings/show.ejs", { foundListing }); // Return added here
     } catch (err) {
-        next(err); // Pass error to Express error handler
+        return next(err); // Return added here
     }
 };
 
@@ -47,9 +47,9 @@ module.exports.createListings = async (req, res, next) => {
         await newListing.save();
 
         req.flash("success", "New Listing Created");
-        return res.redirect("/listings"); // Ensure single response
+        return res.redirect("/listings"); // Return added here
     } catch (err) {
-        next(err); // Pass error to Express error handler
+        return next(err); // Return added here
     }
 };
 
@@ -59,9 +59,9 @@ module.exports.editRenderForm = async (req, res, next) => {
         const foundListing = await listing.findById(id);
         let originalImageUrl = foundListing.image.url;
         originalImageUrl = originalImageUrl.replace("/upload", "/upload/w_250");
-        res.render("listings/edit.ejs", { foundListing, originalImageUrl });
+        return res.render("listings/edit.ejs", { foundListing, originalImageUrl }); // Return added here
     } catch (err) {
-        next(err); // Pass error to Express error handler
+        return next(err); // Return added here
     }
 };
 
@@ -78,9 +78,9 @@ module.exports.updateListing = async (req, res, next) => {
         }
 
         req.flash("success", "Listing updated");
-        return res.redirect(`/listings/${id}`); // Ensure single response
+        return res.redirect(`/listings/${id}`); // Return added here
     } catch (err) {
-        next(err); // Pass error to Express error handler
+        return next(err); // Return added here
     }
 };
 
@@ -89,8 +89,8 @@ module.exports.destroyListing = async (req, res, next) => {
         let { id } = req.params;
         await listing.findByIdAndDelete(id);
         req.flash("success", "Listing deleted");
-        return res.redirect("/listings"); // Ensure single response
+        return res.redirect("/listings"); // Return added here
     } catch (err) {
-        next(err); // Pass error to Express error handler
+        return next(err); // Return added here
     }
 };
