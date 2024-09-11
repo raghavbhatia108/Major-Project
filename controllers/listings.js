@@ -78,7 +78,7 @@ module.exports.updateListing = async (req, res, next) => {
         }
 
         req.flash("success", "Listing updated");
-        return res.redirect(/listings/${id}); // Ensure single response
+        return res.redirect(`/listings/${id}`); // Ensure single response
     } catch (err) {
         next(err); // Pass error to Express error handler
     }
